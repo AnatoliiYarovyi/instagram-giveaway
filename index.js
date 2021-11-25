@@ -1,8 +1,9 @@
 const fs = require('fs/promises');
 const path = require('path');
 
-const wordsPath = path.join(__dirname, 'db', '200k_words_100x100', 'out0.txt');
-const filesPath = path.join(__dirname, 'db', '200k_words_100x100');
+// const wordsPath = path.join(__dirname, 'db', '200k_words_100x100', 'out0.txt');
+// const filesPath = path.join(__dirname, 'db', '200k_words_100x100');
+const filesPath = path.join(__dirname, 'db', '2kk_words_400x400');
 
 // функция возвращает масив всех словосочетаний
 async function getOllWords(data) {
@@ -15,19 +16,17 @@ async function getOllWords(data) {
 }
 
 // функция возвращает масив уникальных словосочетаний (встречаются только 1раз)
-// async function uniqueValues(arr) {
-//   const { duplicatesArr } = await duplicates(arr);
-//   console.log(duplicatesArr);
-//   const unicArr = [];
-//   for (i = 0; i < arr.length; i++) {
-//     let currentWord = arr[i];
-//     let wordFound = duplicatesArr.includes(currentWord);
-//     if (!wordFound) {
-//       unicArr.push(currentWord);
-//     }
-//   }
-//   return unicArr;
-// }
+async function uniqueValues(arr) {
+  const { duplicatesArr, sortArr } = await duplicates(arr);
+  console.log(duplicatesArr);
+  let unicArr = sortArr;
+  for (i = 0; i < duplicatesArr.length; i++) {
+    while (unicArr.includes(duplicatesArr[i])) {
+      unicArr = await binarySearch(duplicatesArr[i], unicArr);
+    }
+  }
+  return unicArr;
+}
 
 // функция возвращает масив словосочетаний которые дублируются и отсортированный массив
 function duplicates(arr) {
@@ -44,18 +43,6 @@ function duplicates(arr) {
   };
 }
 
-// =====================================
-// функция возвращает масив уникальных словосочетаний (встречаются только 1раз)
-async function uniqueValues(arr) {
-  const { duplicatesArr, sortArr } = await duplicates(arr);
-  console.log(duplicatesArr);
-  let unicArr = sortArr;
-  for (i = 0; i < duplicatesArr.length; i++) {
-    unicArr = await binarySearch(duplicatesArr[i], unicArr);
-  }
-  return unicArr;
-}
-
 // функция бинарного поиска
 async function binarySearch(value, unicArr) {
   let returnArr = unicArr;
@@ -69,13 +56,12 @@ async function binarySearch(value, unicArr) {
     middle = Math.floor((first + last) / 2);
     if (returnArr[middle] == value) {
       await returnArr.splice(middle, 1);
-      continue;
-    } else if (unicArr[middle] > value) {
-      last = middle - 1;
-    } else if (unicArr[middle] < value) {
-      first = middle + 1;
-    } else {
       found = true;
+      continue;
+    } else if (returnArr[middle] > value) {
+      last = middle - 1;
+    } else if (returnArr[middle] < value) {
+      first = middle + 1;
     }
   }
   return returnArr;
@@ -93,7 +79,8 @@ const getAll = async () => {
             let wordsPath = path.join(
               __dirname,
               'db',
-              '200k_words_100x100',
+              // '200k_words_100x100',
+              '2kk_words_400x400',
               filename,
             );
             const dataW = await fs
@@ -123,3 +110,19 @@ const getAll = async () => {
 };
 
 getAll();
+
+// --------------------------------------------------------
+// функция возвращает масив уникальных словосочетаний (встречаются только 1раз)
+// async function uniqueValues(arr) {
+//   const { duplicatesArr } = await duplicates(arr);
+//   console.log(duplicatesArr);
+//   const unicArr = [];
+//   for (i = 0; i < arr.length; i++) {
+//     let currentWord = arr[i];
+//     let wordFound = duplicatesArr.includes(currentWord);
+//     if (!wordFound) {
+//       unicArr.push(currentWord);
+//     }
+//   }
+//   return unicArr;
+// }
