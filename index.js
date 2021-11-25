@@ -5,8 +5,8 @@ const path = require('path');
 const wordsPath = path.join(__dirname, 'db', '200k_words_100x100', 'out0.txt');
 
 // --------work with all files ------------
-const filesPath = path.join(__dirname, 'db', '200k_words_100x100');
-// const filesPath = path.join(__dirname, 'db', '2kk_words_400x400');
+// const filesPath = path.join(__dirname, 'db', '200k_words_100x100');
+const filesPath = path.join(__dirname, 'db', '2kk_words_400x400');
 
 // функция возвращает масив всех словосочетаний
 async function getOllWords(data) {
@@ -35,9 +35,7 @@ function duplicates(sortArr) {
 async function uniqueValues(sortArr, duplicatesArr) {
   let unicArr = sortArr;
   for (i = 0; i < duplicatesArr.length; i++) {
-    while (unicArr.includes(duplicatesArr[i])) {
-      unicArr = await binarySearch(duplicatesArr[i], unicArr);
-    }
+    unicArr = await binarySearch(duplicatesArr[i], unicArr);
   }
   return unicArr;
 }
@@ -54,7 +52,8 @@ async function binarySearch(value, unicArr) {
   while (found == false && first <= last) {
     middle = Math.floor((first + last) / 2);
     if (returnArr[middle] == value) {
-      await returnArr.splice(middle, 1);
+      // await returnArr.splice(middle, 1);
+      returnArr = delDubl(middle, value, returnArr);
       found = true;
       continue;
     } else if (returnArr[middle] > value) {
@@ -64,6 +63,24 @@ async function binarySearch(value, unicArr) {
     }
   }
   return returnArr;
+}
+
+// функция удаляет дубликаты
+function delDubl(middle, value, returnArr) {
+  let delArr = returnArr;
+  let i = middle;
+  let j = middle - 1;
+  while (delArr.includes(value) == true) {
+    if (delArr[i] == value) {
+      delArr.splice(i, 1);
+      continue;
+    } else if (delArr[j] == value) {
+      delArr.splice(j, 1);
+      j = j - 1;
+      continue;
+    }
+  }
+  return delArr;
 }
 
 const getAll = async () => {
@@ -76,8 +93,8 @@ const getAll = async () => {
             let wordsPath = path.join(
               __dirname,
               'db',
-              '200k_words_100x100',
-              // '2kk_words_400x400',
+              // '200k_words_100x100',
+              '2kk_words_400x400',
               filename,
             );
             const dataW = await fs
