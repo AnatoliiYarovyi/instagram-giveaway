@@ -2,7 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 
 // ------- work with one file -------------------
-const wordsPath = path.join(__dirname, 'db', '200k_words_100x100', 'out0.txt');
+// const wordsPath = path.join(__dirname, 'db', '200k_words_100x100', 'out0.txt');
 
 // --------work with all files ------------
 // const filesPath = path.join(__dirname, 'db', '200k_words_100x100');
@@ -33,7 +33,7 @@ function duplicates(sortArr) {
 
 // функция возвращает масив уникальных словосочетаний (встречаются только 1раз)
 async function uniqueValues(sortArr, duplicatesArr) {
-  let unicArr = sortArr;
+  let unicArr = [...new Set(sortArr)];
   for (i = 0; i < duplicatesArr.length; i++) {
     unicArr = await binarySearch(duplicatesArr[i], unicArr);
   }
@@ -52,8 +52,7 @@ async function binarySearch(value, unicArr) {
   while (found == false && first <= last) {
     middle = Math.floor((first + last) / 2);
     if (returnArr[middle] == value) {
-      // await returnArr.splice(middle, 1);
-      returnArr = delDubl(middle, value, returnArr);
+      await returnArr.splice(middle, 1);
       found = true;
       continue;
     } else if (returnArr[middle] > value) {
@@ -63,24 +62,6 @@ async function binarySearch(value, unicArr) {
     }
   }
   return returnArr;
-}
-
-// функция удаляет дубликаты
-function delDubl(middle, value, returnArr) {
-  let delArr = returnArr;
-  let i = middle;
-  let j = middle - 1;
-  while (delArr.includes(value) == true) {
-    if (delArr[i] == value) {
-      delArr.splice(i, 1);
-      continue;
-    } else if (delArr[j] == value) {
-      delArr.splice(j, 1);
-      j = j - 1;
-      continue;
-    }
-  }
-  return delArr;
 }
 
 const getAll = async () => {
