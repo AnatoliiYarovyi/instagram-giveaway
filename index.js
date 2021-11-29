@@ -15,10 +15,32 @@ async function getOllWords(data) {
     const arr = data[i].split('\n');
     allWords.push(arr);
   }
-  return allWords.flat();
+  return allWords;
 }
 
-// функция возвращает масив словосочетаний которые дублируются
+// ==================================================================================================
+async function filterValues(allWords) {
+  let unc = [];
+  for (let i = 0; i < allWords.length; i++) {
+    const sortArr = await allWords[i].slice().sort();
+    const uniqueValueCurrentArr = await getUniqueCollocation(sortArr);
+    unc.push(uniqueValueCurrentArr);
+  }
+
+  const sortArrUnc = unc.flat().sort();
+  const uniqueValuesArr = await getUniqueCollocation(sortArrUnc);
+  return uniqueValuesArr;
+}
+
+// ===================================================================================================
+async function getUniqueCollocation(sortArr) {
+  const { duplicatesArr } = await duplicates(sortArr);
+  const setSortArr = [...new Set(sortArr)];
+  const uniqueValuesArr = await uniqueValues(setSortArr, duplicatesArr);
+  return uniqueValuesArr;
+}
+
+// - функция возвращает масив словосочетаний которые дублируются======================================
 function duplicates(sortArr) {
   const duplicatesArr = [];
   for (let i = 0; i < sortArr.length - 1; i++) {
@@ -31,16 +53,16 @@ function duplicates(sortArr) {
   };
 }
 
-// функция возвращает масив уникальных словосочетаний (встречаются только 1раз)
-async function uniqueValues(sortArr, duplicatesArr) {
-  let unicArr = [...new Set(sortArr)];
+// - функция возвращает масив уникальных словосочетаний (встречаются только 1раз)======================
+async function uniqueValues(allCollocation, duplicatesArr) {
+  let unicArr = allCollocation;
   for (i = 0; i < duplicatesArr.length; i++) {
     unicArr = await binarySearch(duplicatesArr[i], unicArr);
   }
   return unicArr;
 }
 
-// функция бинарного поиска
+// - функция бинарного поиска==========================================================================
 async function binarySearch(value, unicArr) {
   let returnArr = unicArr;
 
@@ -64,6 +86,7 @@ async function binarySearch(value, unicArr) {
   return returnArr;
 }
 
+// ==================================================================================================
 const getAll = async () => {
   try {
     const data = await fs
@@ -88,42 +111,15 @@ const getAll = async () => {
       })
       .catch(error => error);
     const allWords = await getOllWords(data);
-    const sortArr = allWords.slice().sort();
-    const { duplicatesArr } = await duplicates(sortArr);
-    console.log(duplicatesArr.length);
-    const uniqueWords = await uniqueValues(sortArr, duplicatesArr);
-    console.log(uniqueWords.length);
 
-    // ======================== work with one file ==============================
-    // const data = await fs
-    //   .readFile(wordsPath)
-    //   .then(data => data.toString())
-    //   .catch(error => error);
-    // const arr = data.split('\n');
-    // const sortArr = arr.slice().sort();
-    // const { duplicatesArr } = await duplicates(sortArr);
-    // const uniqueWords = await uniqueValues(sortArr, duplicatesArr);
-    // console.log(uniqueWords);
-    // ============================================================
+    const allCollocation = [...new Set(allWords.flat())];
+    console.log('allCollocation =', allCollocation.length);
+
+    const uniqueCollocation = await filterValues(allWords);
+    console.log('uniqueCollocation =', uniqueCollocation.length);
   } catch (error) {
     throw error;
   }
 };
 
 getAll();
-
-// --------------------------------------------------------
-// функция возвращает масив уникальных словосочетаний (встречаются только 1раз)
-// async function uniqueValues(arr) {
-//   const { duplicatesArr } = await duplicates(arr);
-//   console.log(duplicatesArr);
-//   const unicArr = [];
-//   for (i = 0; i < arr.length; i++) {
-//     let currentWord = arr[i];
-//     let wordFound = duplicatesArr.includes(currentWord);
-//     if (!wordFound) {
-//       unicArr.push(currentWord);
-//     }
-//   }
-//   return unicArr;
-// }
