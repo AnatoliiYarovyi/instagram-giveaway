@@ -105,7 +105,7 @@ function getUniqueElems(allWords) {
   const resTen = [];
 
   arr.reduce((acc, word, i, arr) => {
-    if (acc.slice(-1)[0] != word) {
+    if (acc.slice(-1)[0] != word || i === arr.length - 1) {
       if (acc.length === 19) {
         resAll.push(acc[0]);
       }
