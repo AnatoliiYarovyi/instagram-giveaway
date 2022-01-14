@@ -35,13 +35,13 @@ const getAll = async () => {
     const uniqueValues = [...new Set(allWords.flat())];
     console.log('uniqueValues =', uniqueValues.length); // = 129240
 
-    // const arr = allWords.flat().sort();
-    // const existInAllFiles = getUniqueElems(arr);
-    // console.log('existInAllFiles =', existInAllFiles.length); // =441
-    // const existInAtLeastTen = getExistInAtLeastTen(arr);
-    // console.log('existInAtLeastTen =', existInAtLeastTen.length); // =73245
+    const arr = allWords.flat().sort();
+    const existInAllFiles = getUniqueElems(arr);
+    console.log('existInAllFiles =', existInAllFiles.length); // =441
+    const existInAtLeastTen = getExistInAtLeastTen(arr);
+    console.log('existInAtLeastTen =', existInAtLeastTen.length); // =73245
 
-    const { resAll, resTen } = getUniqueElems(allWords);
+    const { resAll, resTen } = getUniqueElemsAll(allWords);
     console.log('existInAllFiles =', resAll.length);
     console.log('existInAtLeastTen =', resTen.length);
   } catch (error) {
@@ -60,46 +60,46 @@ async function getOllWords(data) {
 }
 
 // функция возвращает масив элементов встречающихся 20 раз
-// function getUniqueElems(arr) {
-//   const res = [];
+function getUniqueElems(arr) {
+  const res = [];
 
-//   arr.reduce((acc, word, i, arr) => {
-//     if (acc.slice(-1)[0] != word) {
-//       if (acc.length === 19) {
-//         res.push(acc[0]);
-//       }
-//       acc.length = 0;
-//     }
-//     if (arr[i + 1] === word) {
-//       acc.push(word);
-//     }
+  arr.reduce((acc, word, i, arr) => {
+    if (acc.slice(-1)[0] != word || i === arr.length - 1) {
+      if (acc.length === 19) {
+        res.push(acc[0]);
+      }
+      acc.length = 0;
+    }
+    if (arr[i + 1] === word) {
+      acc.push(word);
+    }
 
-//     return acc;
-//   }, []);
-//   return res;
-// }
+    return acc;
+  }, []);
+  return res;
+}
 
 // функция возвращает масив элементов встречающихся 10 раз и более
-// function getExistInAtLeastTen(arr) {
-//   const res = [];
+function getExistInAtLeastTen(arr) {
+  const res = [];
 
-//   arr.reduce((acc, word, i, arr) => {
-//     if (acc.slice(-1)[0] != word) {
-//       if (acc.length >= 9) {
-//         res.push(acc[0]);
-//       }
-//       acc.length = 0;
-//     }
-//     if (arr[i + 1] === word) {
-//       acc.push(word);
-//     }
-//     return acc;
-//   }, []);
-//   return res;
-// }
+  arr.reduce((acc, word, i, arr) => {
+    if (acc.slice(-1)[0] != word || i === arr.length - 1) {
+      if (acc.length >= 9) {
+        res.push(acc[0]);
+      }
+      acc.length = 0;
+    }
+    if (arr[i + 1] === word) {
+      acc.push(word);
+    }
+    return acc;
+  }, []);
+  return res;
+}
 
 // функция возвращает масив элементов встречающихся (20 раз) && (10 раз и более)
-function getUniqueElems(allWords) {
+function getUniqueElemsAll(allWords) {
   const arr = allWords.flat().sort();
   const resAll = [];
   const resTen = [];
